@@ -1,6 +1,10 @@
-package com.slohrsh.ki.machineLearning;
+package com.slohrsh.ki.machineLearning.perzeptron;
 
 import java.util.List;
+
+import com.slohrsh.ki.machineLearning.IClassifier;
+import com.slohrsh.ki.machineLearning.math.IVector;
+import com.slohrsh.ki.machineLearning.math.UnequalDimensionException;
 
 public class Perzeptron implements IClassifier{
 
