@@ -117,7 +117,7 @@ public class NearestNeighbourTest {
 		}
 		else
 		{
-			correctnes = correctClassified/falseClassified;
+			correctnes = (float)correctClassified/(float)falseClassified;
 		}
 		System.out.println("Correctnes: " + correctnes);
 
