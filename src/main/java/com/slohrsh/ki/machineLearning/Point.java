@@ -1,7 +1,5 @@
 package com.slohrsh.ki.machineLearning;
 
-import java.util.List;
-
 import com.slohrsh.ki.machineLearning.math.IVector;
 
 public class Point{

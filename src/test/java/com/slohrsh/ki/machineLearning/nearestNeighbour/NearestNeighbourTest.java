@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.slohrsh.ki.machineLearning.Point;
 import com.slohrsh.ki.machineLearning.math.IVector;
+import com.slohrsh.ki.machineLearning.math.Normalizor;
 import com.slohrsh.ki.machineLearning.math.UnequalDimensionException;
 import com.slohrsh.ki.machineLearning.math.Vector;
 import com.slohrsh.ki.machineLearning.math.VectorFactory;
@@ -112,9 +113,51 @@ public class NearestNeighbourTest {
 		}
 		else
 		{
-			correctnes = (float)correctClassified/(float)falseClassified;
+			correctnes = (float)correctClassified/(float)(correctClassified + falseClassified);
 		}
 		System.out.println("Correctnes: " + correctnes);
+
+	}
+	
+	@Test
+	public void neareastNeigbourWithFileNormalized() {
+		File learnedPointsPath = new File("src/main/resources/LearnedPoints.csv");
+		File testDataPath = new File("src/main/resources/TestData.csv");
+		List<Point> learnedPoints = VectorFactory.readFile(learnedPointsPath);
+		List<Point> testData = VectorFactory.readFile(testDataPath);
+		
+		learnedPoints = Normalizor.normalize(learnedPoints, learnedPoints.get(0).getPoint().getDimension());
+		testData = Normalizor.normalize(testData, testData.get(0).getPoint().getDimension());
+		
+		int correctClassified = 0;
+		int falseClassified = 0;
+		
+		for(Point point : testData)
+		{
+			try {
+				String result = nearest.classify(point.getPoint(), learnedPoints, k);
+				if(result.equals(point.getClazz()))
+				{
+					correctClassified++;
+				}else
+				{
+					falseClassified++;
+				}
+			} catch (UnequalDimensionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		float correctnes;
+		if(falseClassified == 0)
+		{
+			correctnes = 1;
+		}
+		else
+		{
+			correctnes = (float)correctClassified/(float)(correctClassified + falseClassified);
+		}
+		System.out.println("Correctnes of Normalized Vector: " + correctnes);
 
 	}
 }
