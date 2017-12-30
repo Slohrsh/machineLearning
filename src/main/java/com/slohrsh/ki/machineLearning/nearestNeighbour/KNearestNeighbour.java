@@ -2,18 +2,19 @@ package com.slohrsh.ki.machineLearning.nearestNeighbour;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.slohrsh.ki.machineLearning.Point;
 import com.slohrsh.ki.machineLearning.math.IVector;
 import com.slohrsh.ki.machineLearning.math.UnequalDimensionException;
 
 public class KNearestNeighbour {
 
 	List<PointDistance> pointDistances = new ArrayList<PointDistance>();
-	Set<String> learnedPointsKeySet;
-
+	Set<String> knownClasses = new HashSet<String>();
 	Comparator<PointDistance> c = new Comparator<PointDistance>() {
 
 		public int compare(PointDistance o1, PointDistance o2)
@@ -23,12 +24,12 @@ public class KNearestNeighbour {
 		
 	};
 	
-	public String classify(IVector newPoint, Map<String, List<IVector>> learnedPoints, int k) throws UnequalDimensionException {
+	public String classify(IVector newPoint, List<Point> learnedPoints, int k) throws UnequalDimensionException {
 		
-		learnedPointsKeySet = learnedPoints.keySet();
-		for(String key : learnedPoints.keySet())
+		for(Point point : learnedPoints)
 		{
-			calculateDistance(key, learnedPoints.get(key), newPoint);
+			calculateDistance(point.getClazz(), point.getPoint(), newPoint);
+			addKnownClass(point.getClazz());
 		}
 		
 		pointDistances.sort(c);
@@ -36,9 +37,13 @@ public class KNearestNeighbour {
 		return classify(k);
 	}
 
+	private void addKnownClass(String clazz) {
+		knownClasses.add(clazz);
+	}
+
 	private String classify(int k) 
 	{		
-		for(String key : learnedPointsKeySet)
+		for(String key : knownClasses)
 		{
 			int count = 0;
 			for(int i = 0; i < k; i++)
@@ -51,7 +56,7 @@ public class KNearestNeighbour {
 					}
 				}
 			}
-			if(count > k/learnedPointsKeySet.size())
+			if(count > k/knownClasses.size())
 			{
 				return key;
 			}
@@ -60,16 +65,14 @@ public class KNearestNeighbour {
 		return "Random";
 	}
 
-	private void calculateDistance(String clazz, List<IVector> mPlus, IVector newPoint) {
-		for(IVector x : mPlus)
+	private void calculateDistance(String clazz, IVector x, IVector newPoint) 
+	{
+		float distance = 0;
+		for(int i = 0; i< x.getDimension(); i++)
 		{
-			float distance = 0;
-			for(int i = 0; i< x.getDimension(); i++)
-			{
-				distance += Math.abs(x.getValues()[i] - newPoint.getValues()[i]);
-			}
-			pointDistances.add(new PointDistance(clazz, distance));
+			distance += Math.abs(x.getValues()[i] - newPoint.getValues()[i]);
 		}
+		pointDistances.add(new PointDistance(clazz, distance));
 	}
 
 }

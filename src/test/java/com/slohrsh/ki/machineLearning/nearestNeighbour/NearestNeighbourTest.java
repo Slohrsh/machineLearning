@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.slohrsh.ki.machineLearning.Point;
 import com.slohrsh.ki.machineLearning.math.IVector;
 import com.slohrsh.ki.machineLearning.math.UnequalDimensionException;
 import com.slohrsh.ki.machineLearning.math.Vector;
@@ -16,25 +17,21 @@ import com.slohrsh.ki.machineLearning.math.VectorFactory;
 
 public class NearestNeighbourTest {
 
-	Map<String, List<IVector>> learnedPoints = new HashMap<String, List<IVector>>();
+	List<Point> learnedPoints = new ArrayList<Point>();
 	private KNearestNeighbour nearest = new KNearestNeighbour();
 	private int k = 5;
 
 	private void initializeValues() {
-		List<IVector> mPlus = new ArrayList<IVector>();
-		List<IVector> mMinus = new ArrayList<IVector>();
-		mMinus.add(new Vector(new float[] { 6, 1 }));
-		mMinus.add(new Vector(new float[] { 7, 3 }));
-		mMinus.add(new Vector(new float[] { 8, 2 }));
-		mMinus.add(new Vector(new float[] { 9, 0 }));
 
-		mPlus.add(new Vector(new float[] { 8, 4 }));
-		mPlus.add(new Vector(new float[] { 8, 6 }));
-		mPlus.add(new Vector(new float[] { 9, 2 }));
-		mPlus.add(new Vector(new float[] { 9, 5 }));
+		learnedPoints.add(new Point("0", new Vector(new float[] { 6, 1 })));
+		learnedPoints.add(new Point("0", new Vector(new float[] { 7, 3 })));
+		learnedPoints.add(new Point("0", new Vector(new float[] { 8, 2 })));
+		learnedPoints.add(new Point("0", new Vector(new float[] { 9, 0 })));
 		
-		learnedPoints.put("0", mMinus);
-		learnedPoints.put("1", mPlus);
+		learnedPoints.add(new Point("1", new Vector(new float[] { 8, 4 })));
+		learnedPoints.add(new Point("1", new Vector(new float[] { 8, 6 })));
+		learnedPoints.add(new Point("1", new Vector(new float[] { 9, 2 })));
+		learnedPoints.add(new Point("1", new Vector(new float[] { 9, 5 })));
 	}
 
 	@Test
@@ -86,28 +83,26 @@ public class NearestNeighbourTest {
 	public void neareastNeigbourWithFile() {
 		File learnedPointsPath = new File("src/main/resources/LearnedPoints.csv");
 		File testDataPath = new File("src/main/resources/TestData.csv");
-		Map<String, List<IVector>> learnedPoints = VectorFactory.readFile(learnedPointsPath);
-		Map<String, List<IVector>> testData = VectorFactory.readFile(testDataPath);
+		List<Point> learnedPoints = VectorFactory.readFile(learnedPointsPath);
+		List<Point> testData = VectorFactory.readFile(testDataPath);
 
 		int correctClassified = 0;
 		int falseClassified = 0;
 		
-		for (String clazz : testData.keySet()) {
-			List<IVector> testPoints = testData.get(clazz);
-			for (IVector testPoint : testPoints) {
-				try {
-					String result = nearest.classify(testPoint, learnedPoints, k);
-					if(result.equals(clazz))
-					{
-						correctClassified++;
-					}else
-					{
-						falseClassified++;
-					}
-				} catch (UnequalDimensionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		for(Point point : testData)
+		{
+			try {
+				String result = nearest.classify(point.getPoint(), learnedPoints, k);
+				if(result.equals(point.getClazz()))
+				{
+					correctClassified++;
+				}else
+				{
+					falseClassified++;
 				}
+			} catch (UnequalDimensionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		float correctnes;

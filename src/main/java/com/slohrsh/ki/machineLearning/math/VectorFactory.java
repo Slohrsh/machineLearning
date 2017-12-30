@@ -15,14 +15,16 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import com.slohrsh.ki.machineLearning.Point;
+
 public class VectorFactory {
 
-	public static Map<String, List<IVector>> readFile(File file)
+	public static List<Point> readFile(File file)
 	{
 		try {
 			CSVParser parser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT);
 			List<CSVRecord> records = parser.getRecords();
-			Map<String, List<IVector>> map = new HashMap<String, List<IVector>>();
+			List<Point> points = new ArrayList<Point>();
 			for(CSVRecord record : records)
 			{
 				int size = record.size();
@@ -31,19 +33,12 @@ public class VectorFactory {
 				{
 					basicVector[i] = Float.parseFloat(record.get(i));
 				}
-				IVector vector = new Vector(basicVector);
+				IVector point = new Vector(basicVector);
 				String clazz = record.get(size-1);
-				List<IVector> list = map.get(clazz);
-				if(list == null)
-				{
-					list = new ArrayList<IVector>();
-				}
-
-				list.add(vector);
-				map.put(clazz, list);
+				points.add(new Point(clazz, point));
 			}
 			
-			return map;
+			return points;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
