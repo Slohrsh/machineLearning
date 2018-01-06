@@ -2,13 +2,12 @@ package com.slohrsh.ki.machineLearning.nearestNeighbour;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.slohrsh.ki.machineLearning.Crossvalidation;
 import com.slohrsh.ki.machineLearning.Point;
 import com.slohrsh.ki.machineLearning.math.IVector;
 import com.slohrsh.ki.machineLearning.math.Normalizor;
@@ -20,7 +19,7 @@ public class NearestNeighbourTest {
 
 	List<Point> learnedPoints = new ArrayList<Point>();
 	private KNearestNeighbour nearest = new KNearestNeighbour();
-	private int k = 5;
+	private int k = 1;
 
 	private void initializeValues() {
 
@@ -78,6 +77,40 @@ public class NearestNeighbourTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void findBestKWithNormalizedPoints() {
+		Crossvalidation validation = new Crossvalidation();
+		File learnedPointsPath = new File("src/main/resources/LearnedPoints.csv");
+		File testDataPath = new File("src/main/resources/TestData.csv");
+		List<Point> learnedPoints = VectorFactory.readFile(learnedPointsPath);
+		List<Point> testData = VectorFactory.readFile(testDataPath);
+		learnedPoints = Normalizor.normalize(learnedPoints, learnedPoints.get(0).getPoint().getDimension());
+		testData = Normalizor.normalize(testData, testData.get(0).getPoint().getDimension());
+		
+		List<Point> allPoints = new ArrayList<Point>();
+		allPoints.addAll(learnedPoints);
+		allPoints.addAll(testData);
+		
+		int bestK = validation.crossValidate(allPoints, allPoints.size()/10, 10);
+		System.out.println("Best K with normalized points is: " + bestK);
+	}
+	
+	@Test
+	public void findBestKWithoutNormalizedPoints() {
+		Crossvalidation validation = new Crossvalidation();
+		File learnedPointsPath = new File("src/main/resources/LearnedPoints.csv");
+		File testDataPath = new File("src/main/resources/TestData.csv");
+		List<Point> learnedPoints = VectorFactory.readFile(learnedPointsPath);
+		List<Point> testData = VectorFactory.readFile(testDataPath);
+		
+		List<Point> allPoints = new ArrayList<Point>();
+		allPoints.addAll(learnedPoints);
+		allPoints.addAll(testData);
+		
+		int bestK = validation.crossValidate(allPoints, allPoints.size()/10, 10);
+		System.out.println("Best K without normalized points is: " + bestK);
 	}
 
 	@Test
